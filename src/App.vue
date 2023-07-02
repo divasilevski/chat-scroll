@@ -1,6 +1,12 @@
 <template>
-  <main class="container"></main>
+  <main class="container">
+    <Chat />
+  </main>
 </template>
+
+<script lang="ts" setup>
+import Chat from './components/Chat.vue'
+</script>
 
 <style scoped>
 .container {

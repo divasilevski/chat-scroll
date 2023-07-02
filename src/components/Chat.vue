@@ -1,6 +1,11 @@
 <template>
   <div class="chat">
-    <ChatMessages ref="messagesRef" :messages="messages" />
+    <ChatMessages
+      ref="messagesRef"
+      :messages="messages"
+      :status="status"
+      @retry="onRetry"
+    />
     <ChatInput @send="onSend" />
   </div>
 </template>
@@ -9,11 +14,12 @@
 import { ref, computed, watch, watchEffect } from 'vue'
 import { useMessages } from '@/composables/useMessages'
 import { useInfiniteScroll } from '@/composables/useInfiniteScroll'
+import { Status } from '@/types/status'
 import type { Message } from '@/types/message'
 import ChatMessages from '@/components/ChatMessages.vue'
 import ChatInput from '@/components/ChatInput.vue'
 
-const { messages, isFinished, getMessages, sendMessage } = useMessages()
+const { messages, status, getMessages, sendMessage, cleanError } = useMessages()
 
 const messagesRef = ref()
 const scrollRef = computed<HTMLElement>(() => messagesRef.value?.scrollRef)
@@ -21,6 +27,11 @@ const scrollRef = computed<HTMLElement>(() => messagesRef.value?.scrollRef)
 const lastMessageId = computed(() => {
   return messages.value[messages.value.length - 1]?.id
 })
+
+const onRetry = () => {
+  cleanError()
+  getMessages()
+}
 
 const onSend = (message: Message) => {
   sendMessage(message)
@@ -40,7 +51,7 @@ const { disable, enable } = useInfiniteScroll({
 })
 
 watchEffect(() => {
-  isFinished.value ? disable() : enable()
+  status.value !== Status.Loading ? disable() : enable()
 })
 
 watch(lastMessageId, checkAndLoadMore, {

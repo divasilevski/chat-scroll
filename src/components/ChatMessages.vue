@@ -7,12 +7,18 @@
       :is-mine="message.isMine"
     />
 
-    <ChatStatus>Загрузка...</ChatStatus>
+    <ChatStatus>
+      <span v-html="statusMessage" /><br />
+      <a v-if="props.status === Status.Error" @click="$emit('retry')">
+        Повторить попытку?
+      </a>
+    </ChatStatus>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
+import { Status } from '@/types/status'
 import type { Message } from '@/types/message'
 import ChatStatus from '@/components/ChatStatus.vue'
 import ChatMessage from '@/components/ChatMessage.vue'
@@ -22,7 +28,19 @@ const props = defineProps({
     type: Array as () => Readonly<Message[]>,
     default: () => [],
   },
+  status: {
+    type: String as () => Status,
+    default: Status.Loading,
+  },
 })
+
+const statusMessages = {
+  [Status.Finished]: 'Начало диалога',
+  [Status.Loading]: 'Загрузка...',
+  [Status.Error]: 'Не&nbsp;удалось загрузить сообщения.',
+}
+
+const statusMessage = computed(() => statusMessages[props.status])
 
 const scrollRef = ref<HTMLElement>()
 

@@ -6,15 +6,14 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref, watch } from 'vue'
+import { ref, computed, watch, watchEffect } from 'vue'
 import { useMessages } from '@/composables/useMessages'
+import { useInfiniteScroll } from '@/composables/useInfiniteScroll'
 import type { Message } from '@/types/message'
 import ChatMessages from '@/components/ChatMessages.vue'
 import ChatInput from '@/components/ChatInput.vue'
 
-const { messages, getMessages, sendMessage } = useMessages()
-
-getMessages()
+const { messages, isFinished, getMessages, sendMessage } = useMessages()
 
 const messagesRef = ref()
 const scrollRef = computed<HTMLElement>(() => messagesRef.value?.scrollRef)
@@ -33,6 +32,16 @@ const checkAndLoadMore = () => {
     if (scrollHeight <= clientHeight) getMessages()
   }
 }
+
+const { disable, enable } = useInfiniteScroll({
+  scrollRef,
+  threshold: 300,
+  loadMore: getMessages,
+})
+
+watchEffect(() => {
+  isFinished.value ? disable() : enable()
+})
 
 watch(lastMessageId, checkAndLoadMore, {
   flush: 'post',

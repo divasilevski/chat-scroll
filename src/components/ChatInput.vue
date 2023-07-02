@@ -1,14 +1,51 @@
 <template>
   <div class="chat-input">
-    <textarea placeholder="Введите сообщение..." ref="inputRef" rows="1" />
-    <button :disabled="true">
+    <textarea
+      v-model.trim="message"
+      placeholder="Введите сообщение..."
+      ref="inputRef"
+      rows="1"
+      @input="onInput"
+      @keypress.enter.exact.prevent="onSend"
+    />
+    <button @click="onSend" :disabled="!message">
       <AirplaneIcon />
     </button>
   </div>
 </template>
 
 <script lang="ts" setup>
+import { nextTick, ref } from 'vue'
+import { getRandomId } from '@/utils/getRandomId'
+import type { Message } from '@/types/message'
 import AirplaneIcon from '@/components/AirplaneIcon.vue'
+
+const emit = defineEmits<{ (event: 'send', message: Message): void }>()
+
+const inputRef = ref()
+const message = ref('')
+
+const onInput = () => {
+  inputRef.value.style.height = 'auto'
+  inputRef.value.style.height = inputRef.value.scrollHeight + 'px'
+}
+
+const clearInput = () => {
+  message.value = ''
+  nextTick(onInput)
+}
+
+const onSend = () => {
+  if (!message.value) return
+
+  emit('send', {
+    id: getRandomId(),
+    text: message.value,
+    isMine: true,
+  })
+
+  clearInput()
+}
 </script>
 
 <style scoped>

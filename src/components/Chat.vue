@@ -13,6 +13,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch, watchEffect, nextTick } from 'vue'
 import { useMessages } from '@/composables/useMessages'
+import { useHoldScroll } from '@/composables/useHoldScroll'
 import { useInfiniteScroll } from '@/composables/useInfiniteScroll'
 import { Status } from '@/types/status'
 import type { Message } from '@/types/message'
@@ -50,6 +51,8 @@ const checkAndLoadMore = () => {
     if (scrollHeight <= clientHeight) getMessages()
   }
 }
+
+useHoldScroll({ scrollRef, sources: [lastMessageId] })
 
 const { disable, enable } = useInfiniteScroll({
   scrollRef,

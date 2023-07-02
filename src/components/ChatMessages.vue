@@ -12,6 +12,7 @@
 </template>
 
 <script lang="ts" setup>
+import { ref } from 'vue'
 import type { Message } from '@/types/message'
 import ChatStatus from '@/components/ChatStatus.vue'
 import ChatMessage from '@/components/ChatMessage.vue'
@@ -22,6 +23,10 @@ const props = defineProps({
     default: () => [],
   },
 })
+
+const scrollRef = ref<HTMLElement>()
+
+defineExpose({ scrollRef })
 </script>
 
 <style scoped>

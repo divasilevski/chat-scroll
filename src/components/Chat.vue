@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, watch, watchEffect } from 'vue'
+import { ref, computed, watch, watchEffect, nextTick } from 'vue'
 import { useMessages } from '@/composables/useMessages'
 import { useInfiniteScroll } from '@/composables/useInfiniteScroll'
 import { Status } from '@/types/status'
@@ -35,6 +35,13 @@ const onRetry = () => {
 
 const onSend = (message: Message) => {
   sendMessage(message)
+
+  nextTick(() => {
+    scrollRef.value?.scrollTo({
+      behavior: 'smooth',
+      top: Infinity,
+    })
+  })
 }
 
 const checkAndLoadMore = () => {

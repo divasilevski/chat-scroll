@@ -1,16 +1,27 @@
 <template>
   <div ref="scrollRef" class="chat-messages">
-    <ChatMessage text="lol" />
-    <ChatMessage text="lol" :is-mine="true" />
-    <ChatMessage text="lol" />
+    <ChatMessage
+      v-for="message in props.messages"
+      :key="message.id"
+      :text="message.text"
+      :is-mine="message.isMine"
+    />
 
     <ChatStatus>Загрузка...</ChatStatus>
   </div>
 </template>
 
 <script lang="ts" setup>
+import type { Message } from '@/types/message'
 import ChatStatus from '@/components/ChatStatus.vue'
 import ChatMessage from '@/components/ChatMessage.vue'
+
+const props = defineProps({
+  messages: {
+    type: Array as () => Readonly<Message[]>,
+    default: () => [],
+  },
+})
 </script>
 
 <style scoped>
